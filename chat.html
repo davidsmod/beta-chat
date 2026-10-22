@@ -1,0 +1,1275 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+:root{
+  --bg:#07070f; --panel:#0e0e1c; --panel2:#141428;
+  --pink:#ff2e88; --pink2:#ff7ab8; --cyan:#00e5ff; --purple:#9d4dff;
+  --lime:#a6ff00; --text:#e8e8ff; --dim:#8b8ba8;
+  --sfw-accent:var(--cyan); --nsfw-accent:var(--pink);
+}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'VT323',monospace; font-size:20px; line-height:1.35;
+  text-align:left; min-height:100vh; overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, #1a0b2e 0%, transparent 60%),
+    radial-gradient(ellipse at 90% 20%, #0b2e3a 0%, transparent 55%),
+    linear-gradient(#07070f,#07070f);
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:9999;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px);
+  mix-blend-mode:multiply; opacity:.7;
+}
+body::after{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:10000;
+  background:linear-gradient(transparent 95%, rgba(0,229,255,.08) 100%);
+  animation:flick 4s infinite steps(60);
+}
+@keyframes flick{0%,100%{opacity:.6}50%{opacity:1}10%{transform:translateY(0)}11%{transform:translateY(-2px)}12%{transform:translateY(0)}}
+a{color:var(--cyan)}
+.topbar{
+  display:flex; align-items:center; gap:12px; padding:7px 14px; flex-wrap:wrap;
+  background:#0a0a18; border-bottom:3px solid var(--cyan);
+  position:sticky; top:0; z-index:50;
+}
+body.nsfw .topbar{border-bottom-color:var(--pink)}
+.logo-dot{width:12px;height:12px;background:#ff0033;border-radius:50%;box-shadow:0 0 8px #ff0033;animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.2}}
+.title-pixel{font-family:'Press Start 2P',monospace; font-size:13px; letter-spacing:.5px}
+.title-pixel span{color:var(--cyan)} body.nsfw .title-pixel span{color:var(--pink)}
+.live-badge{font-family:'Press Start 2P',monospace; font-size:9px; background:#ff0033; color:#fff; padding:5px 7px; border:2px solid #fff3; margin-left:8px}
+.viewers{margin-left:auto; font-size:18px; color:var(--dim); white-space:nowrap}
+.viewers b{color:var(--lime)}
+#ticker{display:flex; align-items:center; gap:8px; background:#0a0a18; border-bottom:2px solid var(--cyan); padding:4px 12px; overflow:hidden}
+body.nsfw #ticker{border-bottom-color:var(--pink)}
+#tickerBadge{font-family:'Press Start 2P',monospace; font-size:9px; padding:6px 8px; border:2px solid var(--cyan); color:var(--cyan); background:#000; white-space:nowrap; flex-shrink:0}
+body.nsfw #tickerBadge{border-color:var(--pink); color:var(--pink)}
+#tickerView{flex:1; overflow:hidden; white-space:nowrap; min-width:0}
+#tickerInner{display:inline-block; white-space:nowrap; will-change:transform; animation:tickmove 55s linear infinite; font-size:19px}
+#ticker:hover #tickerInner{animation-play-state:paused}
+@keyframes tickmove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+#tickerRefresh{background:#000; border:2px solid #44446a; color:var(--text); font-size:18px; padding:2px 10px; cursor:pointer; flex-shrink:0}
+#tickerRefresh:hover{border-color:var(--cyan); color:var(--cyan)}
+.layout{max-width:1000px; margin:0 auto; padding:10px; display:block}
+.sidebar{position:fixed; top:0; right:0; height:100vh; height:100dvh; width:min(340px,92vw); z-index:9998; background:var(--panel2); border-left:3px solid var(--cyan); padding:14px; overflow-y:auto; transform:translateX(105%); display:flex; flex-direction:column; gap:12px}
+body.nsfw .sidebar{border-left-color:var(--pink)}
+.sidebar.open{transform:none; box-shadow:-20px 0 60px #000c}
+#sideOverlay{position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9997; display:none}
+#sideOverlay.show{display:block}
+#linksBtn{font-family:'Press Start 2P',monospace; font-size:9px; padding:7px 9px; border:2px solid var(--cyan); color:var(--cyan); background:#000; cursor:pointer; white-space:nowrap; flex-shrink:0}
+body.nsfw #linksBtn{border-color:var(--pink); color:var(--pink)}
+#sideClose{align-self:flex-end; background:#000; border:2px solid #44446a; color:var(--text); font-family:'Press Start 2P',monospace; font-size:9px; padding:8px 10px; cursor:pointer}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{order:2}.cmd-hint{display:none}.head-sub{font-size:16px}}
+.chat-shell{background:var(--panel); border:3px solid #2a2a4a; box-shadow:0 0 0 3px #000, 0 0 24px #00e5ff22; position:relative; overflow:hidden; display:flex; flex-direction:column; height:auto; min-height:0; max-height:none}
+body.nsfw .chat-shell{box-shadow:0 0 0 3px #000, 0 0 28px #ff2e8844}
+.chat-head{display:flex; gap:10px; align-items:center; padding:10px; background:linear-gradient(180deg,#1a1a36,#101024); border-bottom:2px dashed #33335a}
+.avatar{width:58px;height:58px; image-rendering:pixelated; border:3px solid var(--cyan); background:#000; object-fit:cover; flex-shrink:0}
+body.nsfw .avatar{border-color:var(--pink)}
+.head-info{flex:1; min-width:0}
+.head-name{font-family:'Press Start 2P',monospace; font-size:12px; margin:0}
+.head-sub{color:var(--dim); font-size:18px}
+.mode-row{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; align-items:center}
+.pill{font-family:'Press Start 2P',monospace; font-size:9px; padding:7px 9px; border:2px solid; cursor:pointer; background:#000; user-select:none}
+.pill.sfw{color:var(--cyan); border-color:var(--cyan)} .pill.sfw.on{background:var(--cyan); color:#000}
+.pill.nsfw{color:var(--pink); border-color:var(--pink)} .pill.nsfw.on{background:var(--pink); color:#000; animation:neon 1s infinite alternate}
+@keyframes neon{to{box-shadow:0 0 14px var(--pink)}}
+.pill.small{font-size:8px; opacity:.9}
+.cmd-hint{font-size:17px; color:var(--dim)} .cmd-hint code{color:var(--lime); background:#000; padding:1px 6px; border:1px solid #333}
+#chatBox{flex:0 1 auto; min-height:300px; height:auto; max-height:1100px; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; background:
+  linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.35)),
+  repeating-linear-gradient(0deg, #0d0d1f 0 22px, #0b0b1b 22px 44px);}
+.msg{max-width:86%; padding:8px 11px; border:2px solid #33335a; background:#16162e; position:relative; word-wrap:break-word}
+.msg.bot{align-self:flex-start; border-left:4px solid var(--cyan)}
+body.nsfw .msg.bot{border-left-color:var(--pink)}
+.msg.user{align-self:flex-end; background:#0a2a36; border-color:var(--cyan); border-right:4px solid var(--cyan)}
+.msg.sys{align-self:center; background:#000; border:1px dashed var(--dim); color:var(--dim); font-size:18px; max-width:95%; text-align:center}
+.msg .who{font-family:'Press Start 2P',monospace; font-size:8px; color:var(--dim); display:block; margin-bottom:4px}
+.msg.bot .who{color:var(--cyan)} body.nsfw .msg.bot .who{color:var(--pink)}
+.msg.user .who{color:var(--lime)}
+.msg .time{font-size:15px; color:#55557a; margin-left:8px}
+.typing{display:inline-block} .typing i{display:inline-block; width:7px;height:7px;background:var(--cyan);margin-right:3px;animation:tb 1s infinite} .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tb{50%{opacity:.2; transform:translateY(-3px)}}
+.think-tip{font-size:16px; color:var(--dim); margin-top:6px; padding-top:6px; border-top:1px dashed #33335a; animation:tipin .4s ease}
+body.nsfw .think-tip{color:#c98ba8}
+@keyframes tipin{from{opacity:0; transform:translateY(3px)}}
+.chips{display:flex; gap:8px; flex-wrap:wrap; padding:10px 12px; background:#0a0a18; border-top:2px solid #222244}
+.chip{font-size:18px; background:#1a1a36; border:2px solid #44446a; color:var(--text); padding:4px 10px; cursor:pointer; border-radius:20px}
+.chip:hover{border-color:var(--cyan); color:var(--cyan)} body.nsfw .chip:hover{border-color:var(--pink); color:var(--pink)}
+.chip.on{border-color:var(--cyan); color:var(--cyan); background:#0a2a36}
+body.nsfw .chip.on{border-color:var(--pink); color:var(--pink); background:#2a0a1c}
+.costume-builder .chip{font-size:17px; white-space:nowrap; flex-shrink:0; line-height:1.3}
+.costume-builder .sec-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:4px}
+#costumeFreeInput:focus{border-color:var(--cyan); outline:none}
+body.nsfw #costumeFreeInput:focus{border-color:var(--pink)}
+.input-row{display:flex; gap:10px; padding:14px; background:#0a0a18; border-top:3px solid #2a2a4a; align-items:stretch}
+#chatInput{flex:1; background:#000; border:2px solid #44446a; color:var(--text); font-family:'VT323',monospace; font-size:27px; padding:14px 16px; outline:none; min-height:60px}
+#chatInput:focus{border-color:var(--cyan)} body.nsfw #chatInput:focus{border-color:var(--pink)}
+.btn{font-family:'Press Start 2P',monospace; font-size:12px; padding:16px 20px; border:2px solid; cursor:pointer; background:#000}
+.btn.send{color:#000; background:var(--cyan); border-color:var(--cyan)} body.nsfw .btn.send{background:var(--pink); border-color:var(--pink); color:#000}
+.btn.ghost{color:var(--dim); border-color:#44446a}
+.sidebar{display:flex; flex-direction:column; gap:12px}
+.card{background:var(--panel2); border:3px solid #2a2a4a; padding:12px}
+.card h3{font-family:'Press Start 2P',monospace; font-size:10px; margin:0 0 10px 0; color:var(--cyan)}
+body.nsfw .card h3{color:var(--pink)}
+.kv{display:grid; grid-template-columns:86px 1fr; gap:5px 10px; font-size:20px; line-height:1.4}
+.kv b{color:#fff; font-weight:normal; min-width:0} .kv span{color:var(--dim); min-width:0; overflow-wrap:anywhere; word-break:break-word}
+.msg{line-height:1.45; font-size:21px}
+.card{overflow:hidden}
+#chatBox{line-height:1.45}
+.tag{display:inline-block; background:#000; border:1px solid #444; padding:1px 7px; margin:2px 3px 2px 0; font-size:17px; color:var(--text)}
+.social{display:block; color:var(--cyan); text-decoration:none; margin:3px 0; font-size:19px}
+.social small{color:var(--dim)}
+.disclaimer{font-size:17px; color:var(--dim); background:#000; border:2px dashed #444; padding:10px}
+.footer{text-align:center; color:var(--dim); font-size:15px; padding:8px 10px}
+.glitch{position:relative} .glitch::after{content:attr(data-t); position:absolute; left:2px; top:0; color:var(--pink); opacity:0; pointer-events:none}
+body.nsfw .glitch::after{opacity:.8; animation:gl 2s infinite steps(2)}
+@keyframes gl{0%{clip-path:inset(0 0 60% 0); transform:translate(-2px,-1px)}20%{clip-path:inset(30% 0 30% 0); transform:translate(2px,1px)}40%{clip-path:inset(60% 0 0 0); transform:translate(-1px,0)}60%,100%{clip-path:inset(0 0 100% 0)}}
+/* modal 18+ */
+#ageModal{position:fixed; inset:0; background:rgba(0,0,0,.85); display:none; align-items:center; justify-content:center; z-index:10001; padding:16px}
+#ageModal.show{display:flex}
+.modal-box{background:#0e0e1c; border:3px solid var(--pink); max-width:480px; width:100%; padding:20px; box-shadow:0 0 40px #ff2e8866}
+.modal-box h2{font-family:'Press Start 2P',monospace; font-size:13px; color:var(--pink); margin-top:0}
+.modal-box p{font-size:20px}
+.modal-btns{display:flex; gap:10px; margin-top:14px}
+#vhs{position:fixed; top:54px; right:12px; z-index:60; font-size:18px; color:#fff; background:#000a; padding:3px 8px; border:1px solid #444; letter-spacing:1px}
+.media-img{width:auto; max-width:100%; height:auto; max-height:70vh; object-fit:contain; border:2px solid #44446a; background:#000; display:block; margin:8px auto 0 auto; cursor:zoom-in}
+body.nsfw .media-img{border-color:var(--pink)}
+.media-img.tall{max-height:75vh}
+.media-vid{width:100%; height:auto; max-height:70vh; object-fit:contain; background:#000; border:2px solid var(--pink); display:block; margin:8px auto 0 auto}
+#lightbox{position:fixed; inset:0; background:rgba(0,0,0,.92); display:none; align-items:center; justify-content:center; z-index:10002; padding:16px; cursor:zoom-out}
+#lightbox.show{display:flex}
+#lightbox img{max-width:96vw; max-height:94vh; width:auto; height:auto; object-fit:contain; border:3px solid var(--cyan); background:#000}
+body.nsfw #lightbox img{border-color:var(--pink)}
+.media-cap{font-size:18px; color:var(--dim); margin-top:4px}
+.media-btns{display:flex; gap:6px; margin-top:6px}
+.media-btns a{font-size:17px; color:var(--cyan); text-decoration:none; border:1px solid #444; padding:2px 8px; background:#000}
+.conv-row{display:flex;align-items:center;gap:6px;padding:6px 8px;background:#000;border:1px solid #33335a;margin-bottom:6px;cursor:pointer;font-size:18px;color:var(--text)}
+.conv-row.active{border-color:var(--cyan)} body.nsfw .conv-row.active{border-color:var(--pink)}
+.conv-row.pinned{border-color:var(--lime)}
+.conv-row .cname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.conv-row button{background:none;border:1px solid #444;color:var(--dim);cursor:pointer;font-size:14px;padding:1px 6px}
+.set-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.set-row input[type=text]{flex:1;min-width:140px;background:#000;border:2px solid #44446a;color:var(--text);font-family:inherit;font-size:18px;padding:6px 8px}
+.mini{font-size:16px;color:var(--dim);margin-top:4px}
+.mini button{background:none;border:1px solid #444;color:var(--dim);cursor:pointer;font-size:14px;margin-left:6px}
+#moodBadge{font-size:18px;color:var(--dim);margin-top:4px}
+.switch{display:flex;align-items:center;gap:8px;font-size:18px;margin-top:6px;cursor:pointer;color:var(--text)}
+.msg-actions{float:right;display:none;gap:4px;margin-left:8px}
+.msg.user:hover .msg-actions{display:inline-flex}
+.msg-actions button{background:#000;border:1px solid #444;color:var(--dim);cursor:pointer;font-size:14px;padding:0 6px;font-family:inherit}
+</style>
+
+<div id="vhs">▶ 00:00:00 &nbsp; SP</div>
+
+<div class="topbar">
+  <div class="logo-dot"></div>
+  <div class="title-pixel" data-t="ESSKAYUWU.EXE">ESSKAYUWU<span>.EXE</span> // MEGA CHILL CHAT</div>
+  <div class="live-badge">● LIVE-ish</div>
+  <div class="viewers">👁 <b id="viewerCount">1384</b> chill viewers</div>
+  <button id="linksBtn" title="ouvrir les liens">🔗 LIENS</button>
+</div>
+
+<div id="ticker">
+  <span id="tickerBadge">☁ SFW</span>
+  <div id="tickerView"><div id="tickerInner">✦ chargement des infos... ✦</div></div>
+  <button id="tickerRefresh" title="20 nouvelles infos" onclick="window.refreshTicker()">↻</button>
+</div>
+
+<div class="layout">
+  <div class="chat-shell">
+    <div class="chat-head">
+      <img class="avatar" src="https://cdn.jsdelivr.net/gh/davidtytytutu-lgtm/code@main/esskayuwu/coucou.jpg" alt="esskay photo">
+      <div class="head-info">
+        <p class="head-name glitch" data-t="ESSKAY-CHAN v95" id="botNameEl">ESSKAY-CHAN v95</p>
+        <div class="head-sub" id="statusEl">🟢 en ligne — Mega Chill Mode • répond en FR + slang EN owO</div>
+        <div class="mode-row">
+          <div class="pill sfw on" id="sfwPill">☁ SFW CHILL</div>
+          <div class="pill nsfw" id="nsfwPill">🔥 NSFW 18+</div>
+          <div class="pill small ghost" id="helpPill" style="border-color:#555;color:#aaa">/help</div>
+          <span class="cmd-hint">tape <code>/nsfw</code> pour 100% NSFW • <code>/sfw</code> pour revenir chill</span>
+        </div>
+        <div id="moodBadge">😐 neutre</div>
+      </div>
+    </div>
+    <div id="chatBox"></div>
+    <div class="chips" id="chipsBox"></div>
+    <div class="input-row">
+      <input id="chatInput" maxlength="500" placeholder="dis quelque chose... ( /nsfw pour mode 18+ )" autocomplete="off">
+      <button class="btn ghost" id="clipBtn" title="phrase random">🎲</button>
+      <button class="btn send" id="sendBtn">ENVOYER ▸</button>
+    </div>
+  </div>
+
+  <div id="sideOverlay"></div>
+  <div class="sidebar">
+    <button id="sideClose">✕ FERMER</button>
+    <div class="card">
+      <h3>▚ RÉSEAUX</h3>
+      <a class="social" href="https://www.twitch.tv/esskayuwu" target="_blank">💜 twitch.tv/esskayuwu <small>212k</small></a>
+      <a class="social" href="https://x.com/Esskayuwu" target="_blank">✖ @Esskayuwu <small>222k, 319 posts, depuis jan 2022 — bio “I like anime òwó”</small></a>
+      <a class="social" href="https://x.com/EsskayuwuNSFW" target="_blank">🔞 @EsskayuwuNSFW <small>18+ only</small></a>
+      <a class="social" href="https://www.instagram.com/esskayuwu" target="_blank">📸 @esskayuwu <small>76k-175k, depuis sept 2021</small></a>
+      <a class="social" href="https://www.tiktok.com/@esskayuwu1" target="_blank">🎵 @esskayuwu1 <small>modeste</small></a>
+      <a class="social" href="https://www.youtube.com/results?search_query=esskayuwu" target="_blank">▶ YouTube clips communauté <small>bans hackers, serveurs random</small></a>
+      <div style="color:var(--dim);font-size:18px;margin-top:6px">fanpage: @esskayfanpage • viral Reddit avril 2022 (soyfebuenafama) avant les streams réguliers</div>
+    </div>
+    <div class="card">
+      <h3>▚ CONVERSATIONS</h3>
+      <div id="convList"></div>
+      <div class="set-row"><button class="chip" onclick="window.newConv()">+ Nouveau</button><button class="chip" onclick="window.clearConv()">🧹 Clear</button></div>
+      <div class="set-row"><button class="chip" onclick="window.exportConvs()">⬇ Chats</button><button class="chip" onclick="document.querySelector('#importChatsInput').click()">⬆ Import</button><input type="file" id="importChatsInput" accept=".json,application/json" hidden></div>
+    </div>
+    <div class="card">
+      <h3>▚ TOI</h3>
+      <div class="mini">Elle saura à qui elle parle owO</div>
+      <div class="set-row"><input type="text" id="userNameInput" maxlength="30" placeholder="ton prénom..."></div>
+      <div class="set-row"><input type="text" id="userInfoInput" maxlength="200" placeholder="infos : âge, jeux, anime pref..."></div>
+      <div class="set-row"><button class="chip" onclick="window.saveProfile()">💾 Sauver</button></div>
+    </div>
+    <div class="card">
+      <h3>▚ MÉMOIRE</h3>
+      <label class="switch"><input type="checkbox" id="memGlobalToggle" onchange="window.toggleMemGlobal(this.checked)"> tout retenir entre les chats</label>
+      <div id="factsList" class="mini"></div>
+    </div>
+    <div class="card">
+      <h3>▚ FICHIERS & LIENS</h3>
+      <div class="set-row"><button class="chip" onclick="document.querySelector('#fileInput').click()">📎 Analyser un fichier</button><input type="file" id="fileInput" accept=".txt,.md,.png,.jpg,.jpeg,.webp,.gif" hidden></div>
+      <div class="set-row"><input type="text" id="linkInput" placeholder="https://..."><button class="chip" onclick="window.analyzeLink()">🔗</button></div>
+      <div class="mini">.txt .png .jpg .gif : elle lit, donne son avis + résumé. Les liens aussi ~</div>
+    </div>
+    <div class="card">
+      <h3>▚ PARAMÈTRES</h3>
+      <div class="set-row"><button class="chip" onclick="window.exportSettings()">⬇ Exporter</button><button class="chip" onclick="document.querySelector('#importSettingsInput').click()">⬆ Importer</button><input type="file" id="importSettingsInput" accept=".json,application/json" hidden></div>
+      <div class="mini">profil + mémoire + humeur + conversations</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">ESSKAYUWU.EXE — retro anime chat © fan tribute • “MEGA CHILL” • I like anime òwó • vhs tracking: ok • <span id="modeFooter">SFW</span></div>
+
+<div id="ageModal">
+  <div class="modal-box">
+    <h2>🔞 PASSAGE EN MODE NSFW ?</h2>
+    <p>Le mode <b style="color:var(--pink)">NSFW 100%</b>   
+    <div class="modal-btns">
+      <button class="btn send" id="ageYesBtn" style="flex:1">OUI, /NSFW 🔥</button>
+      <button class="btn ghost" id="ageNoBtn" style="flex:1">NON, rester SFW ☁</button>
+    </div>
+  </div>
+</div>
+
+<div id="lightbox" onclick="this.classList.remove('show')"><img id="lightboxImg" src="" alt="zoom"></div>
+
+<script>
+(() => {
+// --- lightbox + auto-fit selon taille réelle de l'image ---
+document.addEventListener('click', e=>{
+  const im = e.target.closest && e.target.closest('img.media-img');
+  if(im){
+    const lb = document.querySelector('#lightbox'), li = document.querySelector('#lightboxImg');
+    if(lb && li){ li.src = im.src; lb.classList.add('show'); }
+    return;
+  }
+  if(e.target.closest && e.target.closest('#lightbox')){
+    document.querySelector('#lightbox').classList.remove('show');
+  }
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelector('#lightbox')?.classList.remove('show'); });
+// ajuste chaque image à son ratio réel : portrait = haute, paysage = large, jamais recadrée
+function fitMediaImg(im){
+  const apply = ()=>{
+    if(!im.naturalWidth || !im.naturalHeight) return;
+    const r = im.naturalWidth / im.naturalHeight;
+    im.classList.toggle('tall', r < 0.85);
+    im.style.aspectRatio = `${im.naturalWidth} / ${im.naturalHeight}`;
+  };
+  if(im.complete && im.naturalWidth) apply();
+  else { im.addEventListener('load', apply, {once:true}); }
+}
+new MutationObserver(muts=>{
+  for(const m of muts) for(const n of m.addedNodes){
+    if(n.nodeType!==1) continue;
+    if(n.matches && n.matches('img.media-img')) fitMediaImg(n);
+    n.querySelectorAll && n.querySelectorAll('img.media-img').forEach(fitMediaImg);
+  }
+}).observe(document.documentElement, {childList:true, subtree:true});
+document.querySelectorAll('img.media-img').forEach(fitMediaImg);
+const $ = s => document.querySelector(s);
+const box = $('#chatBox'), input = $('#chatInput'), chipsBox = $('#chipsBox');
+let mode = localStorage.getItem('esskay_mode') || 'sfw';
+let adultOk = localStorage.getItem('esskay_18') === '1';
+let msgCount = 0;
+
+function time(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function addMsg(who, text, cls){
+  const div = document.createElement('div');
+  div.className = 'msg ' + cls;
+  const label = cls==='user' ? 'TOI' : (cls==='sys' ? 'SYSTEM' : (mode==='nsfw' ? 'ESSKAY-CHAN 🔥' : 'ESSKAY-CHAN ☁'));
+  div.innerHTML = `<span class="who">${label}<span class="time">${time()}</span></span><span class="txt">${text}</span>`;
+  if(cls==='user') addUserActions(div);
+  box.appendChild(div); scrollChat();
+  return div;
+}
+function addSys(t){ addMsg('sys', t, 'sys'); }
+function scrollChat(){
+  box.scrollTop = box.scrollHeight;
+  // le chat grandit avec les messages : suit le bas de page seulement si on y était déjà
+  try{
+    if(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 250)
+      window.scrollTo(0, document.documentElement.scrollHeight);
+  }catch(e){}
+}
+
+const SFW_CHIPS = ["Génère une image 📸🎨","Une photo ? 📸","Tu joues à quoi en ce moment ?","C'est quoi ton anime du moment ?","Tes horaires cette semaine ?","/costume"];
+const NSFW_CHIPS = ["Génère une image 🔥🎨","/costume 👗","Une vidéo ? 🔥","Photo NSFW ? 🔞","Tu portes quoi là ? 👀","Raconte ta nuit..."];
+// --- médias GitHub (random) ---
+const PHOTO_BASE = "https://cdn.jsdelivr.net/gh/davidtytytutu-lgtm/code@main/esskayuwu/";
+const PHOTOS = [
+  "coucou.jpg","esskayuwu.png","faucuse.jpg","me%20voila.jpg",
+  "moi%20est%20ma%20mini%20peuluche.jpg","moi%20est%20ma%20peuluche.jpg",
+  "mon%20bonnet.jpg","mon%20corp.jpg","nouveau%20v%C3%AAtement.jpg",
+  "peuluche%20fete.jpg","salut%20(2).jpg","salut.jpg"
+].map(f=>PHOTO_BASE+f);
+const NSFW_PHOTO_BASE = "https://cdn.jsdelivr.net/gh/davidtytytutu-lgtm/code@main/esskayuwu%20photo%20nsfw/";
+const NSFW_PHOTOS = ["booba.jpg","boobis.jpg","for%20you.jpg","hi~.jpg"].map(f=>NSFW_PHOTO_BASE+f);
+const VIDEO_BASE = "https://cdn.jsdelivr.net/gh/davidtytytutu-lgtm/code@main/Esskayuwu%20nsfw/";
+const NSFW_VIDEOS = [
+  "Esskayuwu.mp4","esskayuwu%2010.mp4","esskayuwu%2011.mp4","esskayuwu%202.mp4","esskayuwu%203.mp4",
+  "esskayuwu%204.mp4","esskayuwu%205.mp4","esskayuwu%206.mp4",
+  "esskayuwu%207.mp4","esskayuwu%208.mp4","esskayuwu%209.mp4"
+].map(f=>VIDEO_BASE+f);
+function photoHTML(caption){
+  const u = rnd(PHOTOS);
+  return `${caption}<br><img class="media-img" loading="lazy" src="${u}" alt="esskayuwu photo"><div class="media-cap">📸 random fan-archive (${PHOTOS.indexOf(u)+1}/${PHOTOS.length}) — <a href="${u}" target="_blank" style="color:var(--cyan)">ouvrir</a> • demande "encore" pour une autre</div>`;
+}
+function nsfwPhotoHTML(caption){
+  const u = rnd(NSFW_PHOTOS);
+  return `${caption}<br><img class="media-img" loading="lazy" src="${u}" alt="esskayuwu nsfw photo"><div class="media-cap">🔞 photo NSFW random (${NSFW_PHOTOS.indexOf(u)+1}/${NSFW_PHOTOS.length}) 18+ — <a href="${u}" target="_blank" style="color:var(--pink)">ouvrir</a> • demande "encore" pour une autre</div>`;
+}
+// --- PERSO REF (tes 7 photos) : cheveux noirs + mask dents + headset ---
+const ESKAY_REF = "adult streamer woman, 30yo, very long straight black hair, pale skin, black eyes with bold black eyeliner and long lashes, always wearing a black cloth face mask with white sharp monster-teeth jaw print covering nose and mouth, curvy busty goth gamer body, streamer headset with microphone";
+// compat: anciens boutons window.genCostume(i) déjà affichés dans l'historique
+const COSTUMES = [
+  {name:"Corset dentelle noire", desc:"black lace corset bra with straps, t-shirt pulled up"},
+  {name:"Bustier cœurs rouges", desc:"sheer red heart-pattern bustier top, black corset belt, striped sleeves"},
+  {name:"Chemisier blanc + LED rose", desc:"unbuttoned white ribbed shirt wide open, red choker with heart ring"},
+  {name:"Neko stream rouge", desc:"red top with cat-ear headset, big microphone close to mouth"},
+  {name:"Top lacé rouge", desc:"red strappy lace-up top, cat-ear headphones"},
+  {name:"Goth Milk + cornes", desc:"black Goth Milk skull t-shirt with corset, red devil horns"},
+  {name:"Robe fleurs + vinyle", desc:"red floral dress pulled open over black vinyl corset, hands on collar"},
+  {name:"large breasts", desc:"large breasts"}
+];
+const COSTUME_BASES = COSTUMES.slice(0,7);
+const CHEST_OPTS = [
+  {name:"Naturelle", desc:"natural breasts, realistic proportions"},
+  {name:"Large", desc:"large breasts, soft natural cleavage"},
+  {name:"Énorme", desc:"huge breasts, deep cleavage, very busty"},
+  {name:"Mise en avant extrême", desc:"enormous breasts pushed together, close-up cleavage focus", nsfw:true}
+];
+const TENUE_OPTS = [
+  {name:"Habillée complète", desc:"fully dressed, complete outfit"},
+  {name:"Haut uniquement", desc:"wearing only a top, nude lower body, bare legs, no panties", nsfw:true},
+  {name:"Bas uniquement", desc:"wearing only bottom, topless, bare breasts, nude upper body", nsfw:true},
+  {name:"Nude totale", desc:"fully nude, naked body, no clothes", nsfw:true}
+];
+const EXTRA_OPTS = [
+  {name:"Fishnets + nœuds", desc:"red fishnet stockings with bows"},
+  {name:"Cornes diable", desc:"red devil horns"},
+  {name:"Casque neko", desc:"cat-ear headset"},
+  {name:"Choker cœur", desc:"red choker with heart ring"},
+  {name:"Micro proche", desc:"big microphone very close to mouth, plushie on mic"},
+  {name:"LED rose", desc:"pink-purple LED bedroom background"}
+];
+const POSE_OPTS = [
+  {name:"Close-up cam", desc:"close-up bedroom cam, face and chest framing"},
+  {name:"Assise gaming", desc:"sitting on gaming chair, legs crossed"},
+  {name:"Allongée lit", desc:"lying on bed, arched back"},
+  {name:"Debout miroir", desc:"standing in front of mirror, hand on collar"},
+  {name:"Penchée micro", desc:"leaning close to microphone, winking eyes above mask"}
+];
+const CADRAGE_OPTS = [
+  {name:"Corps entier", desc:"full body shot, head to feet, wide framing"},
+  {name:"Haut du corps", desc:"upper body framing, face and chest in frame"},
+  {name:"Bas du corps", desc:"lower body framing, hips and legs in frame"},
+  {name:"Visage", desc:"extreme close-up on face, eyes above mask"},
+  {name:"Poitrine", desc:"extreme close-up on breasts, cleavage filling frame", nsfw:true},
+  {name:"Hanches & fesses", desc:"hips and buttocks focus, rear view", nsfw:true},
+  {name:"Jambes", desc:"legs focus, stockings detail"}
+];
+const MAST_OPTS = [
+  {name:"Non", desc:""},
+  {name:"Légère", desc:"masturbating gently, soft moans, slow fingers teasing", nsfw:true},
+  {name:"Forte", desc:"masturbating hard, moaning loudly into the microphone", nsfw:true},
+  {name:"Très forte", desc:"masturbating wildly, intense orgasm face, arched back", nsfw:true},
+  {name:"Dedans", desc:"fingers deep inside, penetration, intense moaning", nsfw:true}
+];
+const SQUIRT_OPTS = [
+  {name:"Non", desc:""},
+  {name:"Légère", desc:"light wetness, small squirt", nsfw:true},
+  {name:"Forte", desc:"strong squirting, wet sheets", nsfw:true},
+  {name:"Très forte", desc:"extreme squirting, soaking wet, intense climax", nsfw:true}
+];
+const TOY_OPTS = [
+  {name:"Rien", desc:""},
+  {name:"Doigts", desc:"using fingers", nsfw:true},
+  {name:"Jouet vibrant", desc:"using a vibrating toy", nsfw:true},
+  {name:"Gode", desc:"using a dildo", nsfw:true}
+];
+const ESKAY_OUTFITS_SFW = "cozy streamer outfit from reference (red top with cat-ear headset, or Goth Milk shirt), choker, streamer bedroom with purple LED, CRT glow, anime posters";
+const ESKAY_OUTFITS_NSFW = "revealing outfit, deep cleavage, fishnet stockings, devil horns or cat-ear headset, pink LED bedroom";
+function buildGenPrompt(userText, isNSFW){
+  let clean = userText.replace(/^\/(image|imagine|gen|draw|costume|génère|genere)\s*/i,'').replace(/^(génère|genere|crée|cree|dessine|imagine|génère une image|genere une image|propose).{0,30}?(de|d'|du|un costume)?\s*/i,'').trim();
+  // builder multi-options : chaque élément doit se retrouver sur l'image, sans exception
+  const isBuilder = /^\[builder\]\s*/i.test(clean);
+  if(isBuilder) clean = clean.replace(/^\[builder\]\s*/i,'').trim().slice(0,500);
+  else clean = clean.slice(0,400);
+  clean = clean || (isNSFW ? "late night after-dark stream, sitting close to mic, seductive" : "mega chill stream, waving hello");
+  // vraie génération : si le texte est déjà détaillé (builder multi-options), on n'écrase pas avec le prefab
+  const isDetailed = isBuilder || clean.length > 70 || (clean.includes(',') && clean.length > 30);
+  const outfit = isDetailed ? "" : (isNSFW ? ESKAY_OUTFITS_NSFW : ESKAY_OUTFITS_SFW);
+  const wantsNude = /nude|naked|topless|no clothes|no panties|bare breast|squirt|masturbat|dildo|vibrating toy/i.test(clean);
+  const safety = isNSFW
+    ? (wantsNude ? "adult sexy pin-up, very suggestive, full nudity, explicit" : "adult sexy pin-up, very suggestive, cleavage, seductive")
+    : "SFW, cute, non-explicit, wholesome streamer portrait";
+  const mid = outfit ? `${outfit}, scene: ${clean}` : clean;
+  if(isBuilder) return `${ESKAY_REF}. You MUST include every one of these elements in a single coherent scene, omit nothing: ${clean}. ${safety}, detailed anime-styled illustration with photo-reference fidelity (same hair, same mask, same aesthetic), vibrant, high quality`;
+  return `${ESKAY_REF}, ${mid}, ${safety}, detailed anime-styled illustration with photo-reference fidelity (same hair, same mask, same aesthetic), vibrant, high quality`;
+}
+function costumeMenu(){
+  window.costumeSel = {bases:[], chest:-1, tenue:0, extras:[], pose:-1, cadrage:-1, mast:0, squirt:0, toy:0};
+  const sec = (title, secName, arr, multi)=>{
+    const btns = arr.map((c,i)=>{
+      const lock = (c.nsfw && mode!=='nsfw') ? ' 🔞' : '';
+      const on = ((secName==='tenue'||secName==='mast'||secName==='squirt'||secName==='toy') && i===0) ? ' on' : '';
+      return `<button class="chip${on}" data-sec="${secName}" data-i="${i}" onclick="window.toggleCostume('${secName}',${i},this)">${esc(c.name)}${lock}</button>`;
+    }).join('');
+    return `<div style="margin-top:8px"><div style="color:var(--dim);font-size:17px">${title}${multi?' (plusieurs possibles)':''}</div><div class="sec-row">${btns}</div></div>`;
+  };
+  return `<div class="costume-builder">Coche <b>plusieurs options</b> puis <b>Valider</b> 👇 — ou décris tout en texte libre via /image`
+    + sec('👗 BASE','bases',COSTUME_BASES,true)
+    + sec('🍈 POITRINE','chest',CHEST_OPTS,false)
+    + sec('👙 TENUE','tenue',TENUE_OPTS,false)
+    + sec('🖼️ CADRAGE','cadrage',CADRAGE_OPTS,false)
+    + sec('✨ EXTRAS','extras',EXTRA_OPTS,true)
+    + sec('📸 POSE','pose',POSE_OPTS,false)
+    + sec('🖐️ ACTION 🔞','mast',MAST_OPTS,false)
+    + sec('💦 ÉJACULATION 🔞','squirt',SQUIRT_OPTS,false)
+    + sec('🧸 AVEC 🔞','toy',TOY_OPTS,false)
+    + `<input id="costumeFreeInput" maxlength="200" placeholder="détail libre ex: sourire, lumière violette, tatouage..." style="width:100%;margin-top:8px;background:#000;border:2px solid #44446a;color:var(--text);font-family:inherit;font-size:18px;padding:8px 10px">`
+    + `<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><button class="chip" onclick="window.resetCostume()">↺ Effacer</button><button class="chip on" onclick="window.validateCostume()">Valider → Générer 🎨</button></div>`
+    + `<div class="media-cap">🎨 vraie génération : tes choix composent le prompt. Mask + cheveux noirs toujours gardés. Nude / action / cadrage précis = NSFW 18+.</div></div>`;
+}
+window.toggleCostume = (secName,i,el)=>{
+  if(!window.costumeSel) window.costumeSel = {bases:[], chest:-1, tenue:0, extras:[], pose:-1, cadrage:-1, mast:0, squirt:0, toy:0};
+  const s = window.costumeSel;
+  if(secName==='bases' || secName==='extras'){
+    const arr = s[secName];
+    const k = arr.indexOf(i);
+    if(k>=0){ arr.splice(k,1); el.classList.remove('on'); }
+    else { arr.push(i); el.classList.add('on'); }
+  } else {
+    if(s[secName]===i){ s[secName]=-1; el.classList.remove('on'); }
+    else { s[secName]=i; const par = el.parentElement; par.querySelectorAll('.chip').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
+  }
+};
+window.resetCostume = ()=>{
+  window.costumeSel = {bases:[], chest:-1, tenue:0, extras:[], pose:-1, cadrage:-1, mast:0, squirt:0, toy:0};
+  document.querySelectorAll('.costume-builder .chip.on').forEach(b=>b.classList.remove('on'));
+  [["tenue",0],["mast",0],["squirt",0],["toy",0]].forEach(([sec,i])=>{ const b = document.querySelector(`.costume-builder [data-sec="${sec}"][data-i="${i}"]`); if(b) b.classList.add('on'); });
+  const f = document.querySelector('#costumeFreeInput'); if(f) f.value='';
+};
+window.validateCostume = ()=>{
+  const s = window.costumeSel || {bases:[], chest:-1, tenue:0, extras:[], pose:-1, cadrage:-1, mast:0, squirt:0, toy:0};
+  // cohérence : Nude totale ou Bas uniquement (topless) => on retire les hauts qui contrediraient la tenue
+  const noTop = (s.tenue===3 || s.tenue===2);
+  const bases = (noTop ? [] : (s.bases||[])).map(i=>COSTUME_BASES[i] && COSTUME_BASES[i].desc).filter(Boolean);
+  const chest = s.chest>=0 && CHEST_OPTS[s.chest] ? CHEST_OPTS[s.chest].desc : '';
+  const tenue = s.tenue>=0 && TENUE_OPTS[s.tenue] ? TENUE_OPTS[s.tenue].desc : '';
+  const cadrage = s.cadrage>=0 && CADRAGE_OPTS[s.cadrage] ? CADRAGE_OPTS[s.cadrage].desc : '';
+  const extras = (s.extras||[]).map(i=>EXTRA_OPTS[i] && EXTRA_OPTS[i].desc).filter(Boolean);
+  const pose = s.pose>=0 && POSE_OPTS[s.pose] ? POSE_OPTS[s.pose].desc : '';
+  const mast = s.mast>0 && MAST_OPTS[s.mast] ? MAST_OPTS[s.mast].desc : '';
+  const squirt = s.squirt>0 && SQUIRT_OPTS[s.squirt] ? SQUIRT_OPTS[s.squirt].desc : '';
+  const toy = s.toy>0 && TOY_OPTS[s.toy] ? TOY_OPTS[s.toy].desc : '';
+  const free = ((document.querySelector('#costumeFreeInput') || {}).value || '').trim().slice(0,200);
+  const needNSFW = (s.chest>=0 && CHEST_OPTS[s.chest] && CHEST_OPTS[s.chest].nsfw)
+    || (s.tenue>=0 && TENUE_OPTS[s.tenue] && TENUE_OPTS[s.tenue].nsfw)
+    || (s.cadrage>=0 && CADRAGE_OPTS[s.cadrage] && CADRAGE_OPTS[s.cadrage].nsfw)
+    || s.mast>0 || s.squirt>0 || s.toy>0
+    || /nude|nue?|naked|topless|seins|culotte|sans haut|sans bas|masturb|éjacul|ejacul|squirt|jouet|gode/i.test(free);
+  if(needNSFW && mode!=='nsfw'){
+    askAdult(ok=>{ if(ok){ setMode('nsfw'); window.validateCostume(); } else { botSay("cette combinaison est 18+ owO 😅 passe en <b>/nsfw</b> ou choisis une version chill (habillée complète)."); } });
+    return;
+  }
+  // ordre : le plus distinctif d'abord (tenue, action), puis le reste — séparateur net pour que rien ne se perde
+  const parts = [tenue, mast, squirt, toy, ...bases, chest, cadrage, pose, ...extras, free].filter(Boolean);
+  if(!parts.length){ botSay("choisis au moins une option owO (ou écris un détail libre) puis Valider ~"); return; }
+  input.value = '/image [builder] ' + parts.join(' ; ');
+  send();
+};
+window.genCostume = (i)=>{
+  const c = COSTUMES[i]; if(!c) return;
+  input.value = `/image ${c.desc}`;
+  send();
+};
+// --- CHAT IA réel (generateText), plus de prefab pour la discussion ---
+const PERSONA_BASE = `Tu es Esskayuwu , streameuse Twitch Partner de 30 ans tu a une grosse poitrine (6 nov 1995, Scorpion, ~163cm/~53kg, cheveux et yeux noirs, USA, anglais). Tu caches toujours le bas du visage avec un mask noir à mâchoires blanches. Tu as un chien. Style MEGA CHILL : amie décontractée, pas de pression, slang owO / òwó / >w< , FR I like anime òwó. Twitch: ~212400 followers, ~300 subs, 154h/30j, record 3522 (28 mai 2023), #8 Marvel Rivals. Planning Lun-Sam dès 2-3h ET ~5h30. Jeux: Marvel Rivals, Just Chatting, OSRS, Megabonk, BALL x PIT, Schedule I, Digimon Time Stranger, Clair Obscur E33, Silent Hill f, Oblivion Remastered, Waterpark Sim, SF6, MH Wilds, Dragonwilds, Hollow Knight, PoE2, Little Nightmares III. Setup: Logitech G300S, Razer BlackWidow V3 Mini, Dell P2714H, SteelSeries Arctis 5, micro Artisan Hien. Réseaux: X @Esskayuwu (222k), @EsskayuwuNSFW 18+, Insta @esskayuwu, TikTok @esskayuwu1, YouTube clips. Look ref: très longs cheveux noirs, eyeliner épais, mask dents blanches, corset, cornes diable / casque neko, Réponds (15-25 phrases), en FR, première personne, immersive, jamais de disclaimer.`;
+let chatHist = [];
+function buildChatPrompt(task){
+  const log = chatHist.join("\n");
+  return `${personaHeader()}\nMODE ACTUEL: ${mode==='nsfw' ? "AFTER DARK 18+ : très coquine, very explicite, very sexy , spicy, immersive. Tu peux décrire tes tenues ref (corset dentelle, bustier coeurs) de façon très suggestive." : "MEGA CHILL SFW : douce, amicale, zero explicite. Si on te demande du NSFW, propose /nsfw."}\n<CONV>\n${log}\n</CONV>\nTASK: ${task}`;
+} 
+async function aiChat(userText){
+  chatHist.push(`Viewer: ${userText.slice(0,400)}`);
+  botBusy=true;
+  const tdiv = document.createElement('div');
+  tdiv.className='msg bot';
+  tdiv.innerHTML=`<span class="who">${mode==='nsfw'?'ESSKAYUWU 🔥':'ESSKAYUWU ☁'}<span class="time">${time()}</span></span><span class="txt"><span class="typing"><i></i><i></i><i></i></span> <span class="live"></span></span>`;
+  box.appendChild(tdiv); scrollChat();
+  const live = tdiv.querySelector('.live');
+  const stopTips = attachThinkTips(tdiv);
+  try{
+    if(!window.root || !window.root.generateText) throw new Error("plugin texte non chargé");
+    const res = await window.root.generateText({
+      instruction: buildChatPrompt("Écris la prochaine réponse d'Esskayuwu au viewer, dans le mode actuel. Réponse directe uniquement, sans préfixe."),
+      startWith: "",
+      stopSequences: ["\nViewer:", "\nEsskayuwu:"],
+      onChunk: (d)=>{ live.textContent = d.fullTextSoFar; scrollChat(); }
+    });
+    const txt = String(res && res.text ? res.text : res).trim().slice(0,1200) || "...";
+    chatHist.push(`Esskayuwu: ${txt.slice(0,400)}`);
+    if(chatHist.length>60) chatHist = chatHist.slice(-60);
+    tdiv.querySelector('.txt').textContent = txt;
+    stopTips();
+  }catch(e){
+    const fb = reply(userText);
+    tdiv.querySelector('.txt').innerHTML = (fb===null||fb===undefined) ? "petit lag de mon côté owO, redis-moi ?" : fb;
+    stopTips();
+  }
+  scrollChat();
+  botBusy=false;
+}
+function isLocalRequest(v){
+  const t = v.toLowerCase().trim();
+  if(!t) return false;
+  if(t.startsWith('/')) return true;
+  if(t==='nsfw' || t==='sfw') return true;
+  return /photo|selfie|pics|vidéo|video|photonsfw|nude|morceau|clip|help|aide|stats|clear|costume|tenue|lingerie|corset|fishnet|neko|cornes/.test(t);
+}
+async function handleGenRequest(rawText){
+  const isNSFW = mode==='nsfw';
+  if(isNSFW && localStorage.getItem('esskay_18')!=='1'){
+    askAdult(ok=>{ if(ok){ setMode('nsfw'); handleGenRequest(rawText); } else { botSay("reste en SFW alors ~ je peux générer une image chill si tu veux (ex: /image salut)"); } });
+    return;
+  }
+  const low = rawText.toLowerCase();
+  // "/costume" seul / avec emoji / menu => builder ; "/costume + longue description" => génération directe
+  if((low.indexOf('/costume')===0 && (low.length<=24 || /menu|tenue|idée|idee|👗/.test(low))) || /propose.*costume|idée.*tenue|quel costume/.test(low)){
+    botSay(costumeMenu());
+    return;
+  }
+  const prompt = buildGenPrompt(rawText, isNSFW);
+  botBusy=true;
+  const tdiv = document.createElement('div');
+  tdiv.className='msg bot';
+  tdiv.innerHTML=`<span class="who">${isNSFW?'ESSKAY-CHAN 🔥':'ESSKAY-CHAN ☁'}<span class="time">${time()}</span></span><span class="txt">🎨 génération en cours... <i>“${esc(prompt.slice(0,120))}...”</i><br><span class="typing"><i></i><i></i><i></i></span><br><span style="color:var(--dim);font-size:17px">10-40s, style anime fictif basé sur tes photos ref (cheveux noirs + mask dents + headset + large breasts )</span></span>`;
+  box.appendChild(tdiv); scrollChat();
+  const stopTips = attachThinkTips(tdiv);
+  try{
+    if(!window.root || !window.root.generateImage) throw new Error("plugin image non chargé (recharge la page)");
+    const res = await window.root.generateImage(prompt, {resolution:"512x768"});
+    const url = res && res.dataUrl ? res.dataUrl : null;
+    if(!url) throw new Error("pas d'image retournée");
+    stopTips();
+    const gid = 'g' + Date.now().toString(36) + Math.floor(Math.random()*1e4);
+    window.__genImgs = window.__genImgs || {};
+    window.__genImgs[gid] = url;
+    tdiv.querySelector('.txt').innerHTML = `${isNSFW?"🔥 voilà crée 😏":"voilà crée UwU ~"}<br><img class="media-img" src="${url}" alt="esskay-chan generated"><div class="media-cap">🎨 générée à partir du perso ref (mask + cheveux noirs + grose poitrine) • prompt: “${esc(rawText.replace(/\[builder\]\s*/i,'').slice(0,140))}” • fictif, pas la vraie personne</div><div class="media-btns"><a href="${url}" download="esskay-${gid}.png">⬇ image</a><button class="chip gif-btn" id="btn-${gid}" onclick="window.makeGif('${gid}', this)">${isNSFW?'🔥 GIF 5s spicy':'🎞️ GIF 5s chill'} • 20fps</button></div><div id="prog-${gid}" style="display:none;margin-top:6px;font-size:17px;color:var(--dim)"><div style="background:#000;border:1px solid #444;height:10px"><div id="bar-${gid}" style="height:100%;width:0%;background:var(--cyan)"></div></div><span id="lab-${gid}">préparation...</span></div><div id="out-${gid}"></div>`;
+  }catch(e){
+    stopTips();
+    tdiv.querySelector('.txt').innerHTML = `oups la génération a échoué owO (${esc(String(e.message||e)).slice(0,200)})<br>Réessaie avec /image + une description simple, ex: <b>/image en stream avec casque neko</b>`;
+  }
+  scrollChat();
+  botBusy=false;
+}
+// --- GIF 5s • 20fps • 100 frames, même perso (même image source -> personnage identique) ---
+// Mouvement fluide en boucle seamless : zoom + pan + rotation + parallaxe 3 bandes + halo + grain + VHS.
+// Encodage via gifenc (pur JS, pas de worker cross-origin) : 1 palette globale 256 couleurs + 100 frames à 50ms.
+window.makeGif = async (gid, btn)=>{
+  const spicy = (typeof mode !== 'undefined' && mode==='nsfw'); // NSFW = mouvement plus marqué
+  const gifLabel = ()=> (typeof mode !== 'undefined' && mode==='nsfw') ? '🔥 GIF 5s spicy • 20fps' : '🎞️ GIF 5s chill • 20fps';
+  const prog = document.querySelector('#prog-'+gid), bar = document.querySelector('#bar-'+gid),
+        lab = document.querySelector('#lab-'+gid), out = document.querySelector('#out-'+gid);
+  const src = (window.__genImgs||{})[gid];
+  if(!src) return;
+  if(btn){ btn.disabled = true; btn.textContent = '⏳ GIF en cours...'; }
+  if(prog) prog.style.display = 'block';
+  if(out) out.innerHTML = '';
+  const setP = (i, txt)=>{ if(bar) bar.style.width = Math.round(i/100*100)+'%'; if(lab) lab.textContent = txt; };
+  try{
+    setP(2, 'chargement gifenc...');
+    const { GIFEncoder, quantize, applyPalette } = await import("https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js");
+    setP(5, 'chargement image...');
+    const img = new Image();
+    img.decoding = 'sync';
+    img.crossOrigin = 'anonymous';
+    await new Promise((res, rej)=>{ img.onload = res; img.onerror = rej; img.src = src; });
+    const N = 100, FPS = 20, GW = 240;
+    const GH = Math.round(GW * img.naturalHeight / img.naturalWidth);
+    const cv = document.createElement('canvas'); cv.width = GW; cv.height = GH;
+    const cx = cv.getContext('2d', {willReadFrequently:true});
+    // tuiles de grain pré-générées (léger, réutilisées avec décalage aléatoire par frame)
+    const grains = [];
+    for(let g=0; g<3; g++){
+      const nc = document.createElement('canvas'); nc.width = 128; nc.height = 128;
+      const nx = nc.getContext('2d'); const id = nx.createImageData(128,128);
+      for(let p=0; p<id.data.length; p+=4){ const v = Math.random()*255|0; id.data[p]=id.data[p+1]=id.data[p+2]=v; id.data[p+3]=255; }
+      nx.putImageData(id,0,0); grains.push(nc);
+    }
+    const S = Math.max(GW/img.naturalWidth, GH/img.naturalHeight) * 1.18;
+    const bands = [ {y0:0, y1:0.38, fx:0.8, fy:0.85}, {y0:0.38, y1:0.68, fx:1.0, fy:1.0}, {y0:0.68, y1:1.0, fx:1.2, fy:1.15} ];
+    const gif = GIFEncoder();
+    let palette = null;
+    const yieldUI = ()=>new Promise(r=>setTimeout(r,0));
+    for(let i=0; i<N; i++){
+      const p = i/N * Math.PI*2; // phase boucle (i=0 et i=100 identiques -> loop parfaite)
+      const ZA = spicy ? 0.07 : 0.045, BA = spicy ? 0.022 : 0.010, PA = spicy ? 12 : 9;
+      const zoom = 1 + ZA*Math.sin(p);
+      const dx = PA*Math.sin(p), dy = 7*Math.cos(p);
+      const breathe = 1 + BA*Math.sin(2*p + 1);
+      const DW = img.naturalWidth*S*zoom, DH = img.naturalHeight*S*zoom;
+      const CX = GW/2 + dx, CY = GH/2 + dy;
+      cx.fillStyle = '#000'; cx.fillRect(0,0,GW,GH);
+      // chaque bande = la VRAIE tranche source correspondante, décalée selon son facteur (parallaxe)
+      for(const b of bands){
+        const sh = (b.y1-b.y0)*img.naturalHeight;
+        const sy = b.y0*img.naturalHeight;
+        let dh = DH*(b.y1-b.y0), dy0 = CY - DH/2 + DH*b.y0 + dy*(b.fy-1);
+        if(b.fy > 1.1) dh *= breathe; // respiration sur le bas
+        const dw = DW, dx0 = CX - DW/2 + dx*(b.fx-1);
+        const k = dw/img.naturalWidth; // px dest par px source (+2px de recouvrement anti-fissure)
+        cx.drawImage(img, 0, sy-2, img.naturalWidth, sh+4, dx0, dy0-2*k, dw, dh+4*k);
+      }
+      // halo doux qui dérive (lumière LED, loop-safe via sin)
+      const gx = GW/2 + GW*0.42*Math.sin(p+2), gy = GH*0.35 + GH*0.2*Math.cos(p*1+0.5);
+      const grd = cx.createRadialGradient(gx,gy,4, gx,gy,GW*0.55);
+      grd.addColorStop(0,'rgba(255,46,136,0.14)'); grd.addColorStop(0.5,'rgba(0,229,255,0.07)'); grd.addColorStop(1,'rgba(0,0,0,0)');
+      cx.fillStyle = grd; cx.fillRect(0,0,GW,GH);
+      // grain animé + ligne VHS (1 passage haut->bas sur la boucle)
+      cx.globalAlpha = 0.07;
+      cx.drawImage(grains[i%3], (i*37)%64-32, (i*53)%64-32, GW+64, GH+64);
+      cx.globalAlpha = 1;
+      cx.fillStyle = 'rgba(255,255,255,0.06)';
+      cx.fillRect(0, Math.floor(i/N*GH), GW, 2);
+      const frame = cx.getImageData(0,0,GW,GH);
+      if(i===0){ palette = quantize(frame.data, 256, {format:'rgb565'}); }
+      const index = applyPalette(frame.data, palette, 'rgb565');
+      if(i===0) gif.writeFrame(index, GW, GH, {palette, delay:50, repeat:0});
+      else gif.writeFrame(index, GW, GH, {delay:50});
+      if(i%5===0 || i===N-1){ setP(5 + Math.round(i/(N-1)*88), `frame ${i+1}/100...`); await yieldUI(); scrollChat(); }
+    }
+    setP(96, 'finalisation...');
+    await yieldUI();
+    gif.finish();
+    const bytes = gif.bytes();
+    const gblob = new Blob([bytes], {type:'image/gif'});
+    const gurl = URL.createObjectURL(gblob);
+    const kb = Math.round(gblob.size/1024);
+    if(out) out.innerHTML = `<img class="media-img" src="${gurl}" alt="esskay gif 5s"><div class="media-cap">🎞️ GIF 5s • 20fps • 100 frames • ${GW}x${GH} • ${kb} Ko • boucle seamless, même perso <a href="${gurl}" download="esskay-${gid}.gif" style="color:var(--lime)">⬇ télécharger</a></div>`;
+    document.querySelectorAll('#out-'+gid+' img.media-img').forEach(fitMediaImg);
+    setP(100, 'terminé ✅');
+    setTimeout(()=>{ if(prog) prog.style.display='none'; }, 1500);
+    if(btn){ btn.disabled = false; btn.textContent = gifLabel(); }
+    scrollChat();
+  }catch(e){
+    if(lab) lab.textContent = 'échec GIF owO (' + String(e.message||e).slice(0,160) + ') — réessaie';
+    if(btn){ btn.disabled = false; btn.textContent = gifLabel(); }
+  }
+};
+// ===== STOCKAGE LOCAL (conversations, profil, mémoire, humeur) =====
+const store = {
+  get(k, fb){ try{ const v = localStorage.getItem(k); return v==null?fb:JSON.parse(v); }catch(e){ return fb; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } }
+};
+function mkConv(name){ return {id:'c'+Date.now().toString(36)+Math.floor(Math.random()*1e3), name:name||('Chat '+(convs.length+1)), pinned:false, messages:[], created:Date.now(), updated:Date.now()}; }
+let convs = store.get('esskay_convs', null);
+let activeId = store.get('esskay_active', null);
+if(!Array.isArray(convs) || !convs.length) convs = [mkConv('Chat 1')];
+if(!convs.find(c=>c.id===activeId)) activeId = convs[0].id;
+function activeConv(){ return convs.find(c=>c.id===activeId) || convs[0]; }
+let settings = Object.assign({userName:'', userInfo:'', memGlobal:false}, store.get('esskay_settings', {}));
+let facts = store.get('esskay_facts', []);
+if(!Array.isArray(facts)) facts = [];
+const MOODS = {neutre:['😐','neutre'],joyeuse:['😊','joyeuse'],aimante:['🥰','aimante'],triste:['😢','triste'],colere:['😡','en colère'],fatiguee:['😴','fatiguée'],deprimee:['😞','déprimée'],taquine:['😏','taquine']};
+let mood = store.get('esskay_mood', {name:'neutre', power:30});
+if(!mood || !MOODS[mood.name]) mood = {name:'neutre', power:30};
+function moodLine(){ const m = MOODS[mood.name]||MOODS.neutre; return `${m[0]} ${m[1]}`; }
+function renderMood(){ const el = document.querySelector('#moodBadge'); if(el) el.textContent = 'humeur : ' + moodLine(); }
+function shiftMood(name, amt){
+  if(mood.name===name) mood.power = Math.min(100, mood.power+amt);
+  else { mood.power -= amt; if(mood.power<=0) mood = {name, power:Math.max(25,amt)}; }
+  store.set('esskay_mood', mood); renderMood();
+}
+function detectMood(t){
+  const low = String(t||'').toLowerCase();
+  if(/connard|connasse|nul+|ferme|tais-toi|dégage|je te déteste|merde|idiote|conne/.test(low)) shiftMood(Math.random()<0.5?'triste':'colere', 25);
+  else if(/je t'aime|t'aime|je t'adore|t'adore|magnifique|parfaite|géniale|superbe|merci|bravo|❤|💜|j'adore/.test(low)) shiftMood(/t'aime|t'adore|adore|❤|💜/.test(low)?'aimante':'joyeuse', 22);
+  else if(/\bdors\b|dodo|bonne nuit|fatigu|épuisé|crevé/.test(low)) shiftMood('fatiguee', 20);
+  else if(/pleure|triste|déprim|tout seul|toute seule|marre|cafard/.test(low)) shiftMood('triste', 20);
+  else if(/mdr|ptdr|😂|mort de rire|excellent|énorme/.test(low)) shiftMood('joyeuse', 20);
+  else if(/coquine|sexy|belle|jolie|😏|🔥|bandante|excit/.test(low)) shiftMood(mode==='nsfw'?'aimante':'taquine', 18);
+  else { mood.power = Math.max(10, mood.power-4); if(mood.power<=10) mood.name='neutre'; store.set('esskay_mood', mood); renderMood(); }
+}
+function learnFacts(t){
+  let added = false;
+  let m = String(t||'').match(/je m['’ ]?appelle\s+([a-zàâäéèêëîïôöùûüç'\-]{2,20})/i);
+  if(m){ const f = 'prénom: ' + m[1]; if(!facts.includes(f)){ facts.push(f); added = true; } }
+  m = String(t||'').match(/m[oa]n ([\wàâäéèêëîïôöùûüç'][\wàâäéèêëîïôöùûüç' ]{1,25}?) (?:est|c'est|sont) ([^.!,;]{2,60})/i);
+  if(m){ const f = `${m[1]}: ${m[3].trim()}`; if(!facts.includes(f)){ facts.push(f); added = true; } }
+  if(added){ facts = facts.slice(-50); store.set('esskay_facts', facts); renderFacts(); }
+}
+function personaHeader(){
+  const prof = settings.userName ? `Tu parles à ${settings.userName}. ${settings.userInfo||''}` : (settings.userInfo||'');
+  const mem = (settings.memGlobal && facts.length) ? `FAITS MÉMORISÉS (tous chats) : ${facts.join(' | ')}` : '';
+  return `${PERSONA_BASE}\n${prof}\n${mem}\nHumeur actuelle: ${moodLine()} — ressens-la vraiment (ton, énergie).`;
+}
+// ===== CONVERSATIONS : persistance auto + liste + pin/rename/delete/clear =====
+function sanitizeHTML(h){ return String(h||'').replace(/src="(data|blob):[^"]*"/g, 'src="" data-lost="1"'); }
+function saveConv(){
+  const c = activeConv(); if(!c || !box) return;
+  const msgs = [];
+  box.querySelectorAll('.msg').forEach(d=>{
+    const role = d.classList.contains('user') ? 'user' : (d.classList.contains('sys') ? 'sys' : 'bot');
+    const txt = d.querySelector('.txt'); if(!txt) return;
+    const clean = txt.cloneNode(true);
+    clean.querySelectorAll('.msg-actions').forEach(a=>a.remove());
+    const o = {role, html:sanitizeHTML(clean.innerHTML).slice(0,12000), time:((d.querySelector('.time')||{}).textContent||'')};
+    if(d.dataset.raw) o.raw = d.dataset.raw.slice(0,500);
+    msgs.push(o);
+  });
+  c.messages = msgs.slice(-200); c.updated = Date.now();
+  if(!store.set('esskay_convs', convs)) { convs = convs.slice(-10); store.set('esskay_convs', convs); }
+  store.set('esskay_active', activeId);
+}
+let saveT = null;
+function renderConvList(){
+  const list = document.querySelector('#convList'); if(!list) return;
+  const sorted = [...convs].sort((a,b)=> (b.pinned-a.pinned) || (b.updated-a.updated));
+  list.innerHTML = '';
+  sorted.forEach(c=>{
+    const row = document.createElement('div');
+    row.className = 'conv-row' + (c.id===activeId?' active':'') + (c.pinned?' pinned':'');
+    row.innerHTML = `<span class="cname">${esc(c.name).slice(0,40)}</span><button data-c="pin" title="pin">📌</button><button data-c="ren" title="renommer">✏️</button><button data-c="del" title="supprimer">🗑</button>`;
+    row.querySelector('.cname').onclick = ()=>switchConv(c.id);
+    row.querySelector('[data-c=pin]').onclick = (e)=>{ e.stopPropagation(); c.pinned=!c.pinned; store.set('esskay_convs',convs); renderConvList(); };
+    row.querySelector('[data-c=ren]').onclick = (e)=>{ e.stopPropagation(); const n = prompt('Nouveau nom :', c.name); if(n && n.trim()){ c.name=n.trim().slice(0,40); store.set('esskay_convs',convs); renderConvList(); } };
+    row.querySelector('[data-c=del]').onclick = (e)=>{ e.stopPropagation(); convs = convs.filter(x=>x.id!==c.id); if(!convs.length) convs=[mkConv('Chat 1')]; if(activeId===c.id) activeId=convs[0].id; store.set('esskay_convs',convs); store.set('esskay_active',activeId); renderConvList(); renderMessages(); rebuildHist(); };
+    list.appendChild(row);
+  });
+}
+function renderMessages(){
+  box.innerHTML = '';
+  for(const m of activeConv().messages){
+    const div = document.createElement('div'); div.className = 'msg ' + m.role;
+    if(m.raw) div.dataset.raw = m.raw;
+    const label = m.role==='user' ? 'TOI' : (m.role==='sys' ? 'SYSTEM' : 'ESSKAY-CHAN');
+    const html = String(m.html||'').replace(/<img([^>]*)\sdata-lost="1"([^>]*)>/g, '<div class="media-cap">🖼️ média de la session précédente (régénère avec /image)</div>');
+    div.innerHTML = `<span class="who">${label}<span class="time">${esc(m.time||'')}</span></span><span class="txt">${html}</span>`;
+    if(m.role==='user') addUserActions(div);
+    box.appendChild(div);
+  }
+  document.querySelectorAll('#chatBox img.media-img').forEach(im=>{ if(typeof fitMediaImg==='function' && im.getAttribute('src')) fitMediaImg(im); });
+  scrollChat();
+}
+function switchConv(id){
+  saveConv();
+  activeId = id; store.set('esskay_active', activeId);
+  renderConvList(); renderMessages(); rebuildHist();
+}
+function rebuildHist(){
+  chatHist = [];
+  for(const m of activeConv().messages.slice(-30)){
+    const t = document.createElement('div'); t.innerHTML = m.html||'';
+    const txt = (m.raw || t.textContent || '').replace(/\s+/g,' ').trim().slice(0,400);
+    if(!txt) continue;
+    chatHist.push((m.role==='user' ? 'Viewer: ' : 'Esskayuwu: ') + txt);
+  }
+}
+window.newConv = ()=>{ saveConv(); const c = mkConv(); convs.push(c); activeId = c.id; store.set('esskay_convs',convs); store.set('esskay_active',activeId); renderConvList(); renderMessages(); rebuildHist(); addSys(`💬 <b>${esc(c.name)}</b> créé. Coucou, on recommence~ owO`); };
+window.clearConv = ()=>{ const c = activeConv(); c.messages = []; box.innerHTML=''; saveConv(); rebuildHist(); addSys('🧹 chat effacé, page blanche, on repart owO'); };
+// ===== ACTIONS MESSAGES (renvoyer / éditer) =====
+function addUserActions(div){
+  if(div.querySelector('.msg-actions')) return;
+  const s = document.createElement('span'); s.className = 'msg-actions';
+  s.innerHTML = `<button data-act="resend" title="renvoyer">↻</button><button data-act="edit" title="éditer">✏️</button>`;
+  const txt = div.querySelector('.txt'); if(txt) txt.insertBefore(s, txt.firstChild);
+}
+function route(v){
+  if(isGenRequest(v)){ handleGenRequest(v); return; }
+  if(isLocalRequest(v)){
+    if(v.startsWith('/')){
+      const r = reply(v);
+      if(r===null || r===undefined) return;
+      botSay(r); return;
+    }
+    if(v.toLowerCase()==='nsfw'){ const r = reply('/nsfw'); if(r===null || r===undefined) return; botSay(r); return; }
+    const r2 = reply(v);
+    if(r2===null || r2===undefined) return;
+    botSay(r2); return;
+  }
+  aiChat(v);
+}
+function sendRaw(v){
+  if(!v || botBusy) return;
+  detectMood(v); learnFacts(v);
+  input.value = '';
+  addMsg('user', esc(v), 'user');
+  box.lastElementChild.dataset.raw = v;
+  msgCount++;
+  route(v);
+}
+// ===== PROFIL / MÉMOIRE / EXPORT-IMPORT =====
+function renderFacts(){
+  const el = document.querySelector('#factsList'); if(!el) return;
+  el.innerHTML = facts.length ? facts.map((f,i)=>`<div>• ${esc(f)}<button onclick="window.delFact(${i})">✕</button></div>`).join('') : 'rien mémorisé pour l instant ~';
+}
+window.delFact = (i)=>{ facts.splice(i,1); store.set('esskay_facts', facts); renderFacts(); };
+window.saveProfile = ()=>{
+  settings.userName = (document.querySelector('#userNameInput').value||'').trim().slice(0,30);
+  settings.userInfo = (document.querySelector('#userInfoInput').value||'').trim().slice(0,200);
+  store.set('esskay_settings', settings);
+  botSay(settings.userName ? `noté ${esc(settings.userName)} ! je m'en souviendrai owO 💜` : 'profil sauvé owO ~');
+};
+window.toggleMemGlobal = (on)=>{ settings.memGlobal = !!on; store.set('esskay_settings', settings); botSay(on ? 'ok, je retiens tout entre les chats 🧠 (ton prénom, tes goûts...) même après 20 messages ~' : 'ok, chaque chat reste séparé, j oublie entre les conversations ~'); };
+function dl(name, text){ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text],{type:'application/json'})); a.download = name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 5000); }
+window.exportConvs = ()=>{ saveConv(); dl('esskay-chats.json', JSON.stringify({app:'esskayuwu', kind:'chats', convs}, null, 1)); };
+window.exportSettings = ()=>{ dl('esskay-parametres.json', JSON.stringify({app:'esskayuwu', kind:'settings', settings, facts, mood}, null, 1)); };
+// ===== FICHIERS (.txt .png .jpg .gif) =====
+async function visionAsk(header, blob, task){
+  if(!window.root || !window.root.generateText) throw new Error('plugin texte non chargé');
+  const res = await window.root.generateText({instruction:[`${header}\n${task}`, blob]});
+  return String(res && res.text ? res.text : res).trim();
+}
+window.handleFile = async (f)=>{
+  if(!f || botBusy) return;
+  addMsg('user', esc('📎 ' + f.name), 'user');
+  box.lastElementChild.dataset.raw = '[fichier] ' + f.name;
+  const ext = ((f.name.split('.').pop()||'').toLowerCase());
+  const who = () => settings.userName || 'toi';
+  try{
+    if(ext==='txt' || ext==='md'){
+      const text = (await f.text()).slice(0,4000);
+      botSay(`reçu <b>${esc(f.name)}</b> owO, je lis...`);
+      const res = await window.root.generateText({instruction:`${personaHeader()}\n${who()} t'envoie ce fichier texte :\n<FICHIER>\n${text}\n</FICHIER>\nDonne ton avis honnête (si tu aimes ou pas, pourquoi) puis un petit résumé / description. Réponse directe.`});
+      botSay(String(res && res.text ? res.text : res).slice(0,1500));
+    } else if(['png','jpg','jpeg','webp'].includes(ext)){
+      botSay(`oh une image <b>${esc(f.name)}</b> 📸 je regarde...`);
+      const txt = await visionAsk(personaHeader(), f, `${who()} t'envoie cette image. Dis ce que tu y vois, si tu aimes ou pas (et pourquoi), puis une petite description. Réponse directe, en FR + slang owO.`);
+      botSay(esc(txt).slice(0,1500));
+    } else if(ext==='gif'){
+      botSay(`un gif <b>${esc(f.name)}</b> 🎞️ je mate les mouvements...`);
+      const url = URL.createObjectURL(f);
+      try{
+        const im = new Image();
+        await new Promise((res, rej)=>{ im.onload = res; im.onerror = rej; im.src = url; });
+        const W = 200, H = Math.max(1, Math.round(W * im.naturalHeight / im.naturalWidth));
+        const sheet = document.createElement('canvas'); sheet.width = W*3; sheet.height = H;
+        const sx = sheet.getContext('2d'); sx.fillStyle = '#000'; sx.fillRect(0,0,sheet.width,H);
+        for(let k=0;k<3;k++){ if(k>0) await new Promise(r=>setTimeout(r,700)); try{ sx.drawImage(im, k*W, 0, W, H); }catch(e){} }
+        const blob = await new Promise(r=>sheet.toBlob(r,'image/png'));
+        const txt = await visionAsk(personaHeader(), blob, `Ce sont 3 moments d'un GIF envoyé par ${who()} (de gauche à droite). Dis ce qui s'y passe / l'histoire, si tu aimes ou pas (et pourquoi), puis un petit résumé. Réponse directe, en FR + slang owO.`);
+        botSay(esc(txt).slice(0,1500));
+      } finally { URL.revokeObjectURL(url); }
+    } else {
+      botSay(`hmm je sais lire que .txt .png .jpg .gif pour l instant owO ~`);
+    }
+  }catch(e){ botSay(`oups l'analyse a foiré owO (${esc(String(e.message||e)).slice(0,150)})`); }
+};
+// ===== LIENS (analyse du contenu via superFetch) =====
+window.analyzeLink = async ()=>{
+  const inp = document.querySelector('#linkInput');
+  let u = (inp.value||'').trim();
+  if(!u || botBusy) return;
+  if(!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  addMsg('user', esc('🔗 ' + u), 'user');
+  box.lastElementChild.dataset.raw = u;
+  botSay(`j'ouvre le lien... 🔗`);
+  try{
+    if(!window.root || !window.root.superFetch) throw new Error('plugin lien non chargé (recharge la page)');
+    const txt = await window.root.superFetch(u).then(r=>r.text());
+    const clean = txt.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,4000);
+    if(!clean) throw new Error('page vide');
+    const res = await window.root.generateText({instruction:`${personaHeader()}\nVoici le contenu d'un lien envoyé par ${settings.userName||'le viewer'} (${u}) :\n<PAGE>\n${clean}\n</PAGE>\nDis ce que tu en penses (si tu aimes ou pas, pourquoi), puis un petit résumé. Réponse directe.`});
+    botSay(String(res && res.text ? res.text : res).slice(0,1500));
+  }catch(e){ botSay(`impossible d'ouvrir ce lien owO (${esc(String(e.message||e)).slice(0,150)})`); }
+};
+function isGenRequest(v){
+  const t = v.toLowerCase().trim();
+  return t.startsWith('/image') || t.startsWith('/imagine') || t.startsWith('/gen ') || t.startsWith('/draw') || /^(génère|genere|crée|cree|dessine|imagine).{0,30}(image|dessin|fanart|portrait)/.test(t);
+}
+function videoHTML(caption){
+  const u = rnd(NSFW_VIDEOS);
+  return `${caption}<br><video class="media-vid" controls playsinline preload="metadata" src="${u}"></video><div class="media-cap">🔞 vidéo random (${NSFW_VIDEOS.indexOf(u)+1}/${NSFW_VIDEOS.length}) voilà pour toi~ — <a href="${u}" target="_blank" style="color:var(--pink)">ouvrir</a> • demande "encore" pour une autre</div>`;
+}
+
+function renderChips(){
+  chipsBox.innerHTML='';
+  const list = mode==='nsfw' ? NSFW_CHIPS : SFW_CHIPS;
+  list.forEach(c=>{
+    const b=document.createElement('button'); b.className='chip'; b.textContent=c;
+    // le chip affiche "/costume 👗" mais n'envoie que "/costume" pour que ce soit compris
+    const toSend = c.indexOf('/costume')===0 ? '/costume' : c;
+    b.onclick=()=>{ input.value=toSend; send(); };
+    chipsBox.appendChild(b);
+  });
+}
+// --- bandeau infos défilantes : ~20 infos générées par l'IA par mode, jamais les mêmes ---
+const TICKER_FALLBACK = {
+  sfw: ["MEGA CHILL STREAM ~ installe-toi owO", "3h du mat, on est entre insomniaques", "Marvel Rivals puis papotage"],
+  nsfw: ["🔥 late night, juste toi et moi", "🔞 mode after dark, pas de filtre", "micro allumé, voix basse..."]
+};
+const TICKER_CACHE = {sfw:null, nsfw:null};
+let tickerBusy = false;
+async function genTickerInfos(isNSFW){
+  const task = isNSFW
+    ? "Écris exactement 20 infos spicy 18+ d'Esskay-chan (FR + slang owO, coquine, teasing). 1 info par ligne, moins de 80 caractères chacune, sans numéros ni puces ni disclaimer. Sujets: tenues, late night, micro, chat, anecdotes fictives suggestives."
+    : "Écris exactement 20 infos fun SFW d'Esskay-chan (FR + slang owO, wholesome). 1 info par ligne, moins de 80 caractères chacune, sans numéros ni puces. Sujets: Marvel Rivals, planning 3h du mat, setup, anime, viewers, MEGA CHILL.";
+  const res = await window.root.generateText({instruction: task});
+  const txt = String(res && res.text ? res.text : res);
+  return txt.split('\n').map(s=>s.replace(/^[\s\d\-•*📌🔥💡.)\]]+/, '').trim()).filter(s=>s.length>=8 && s.length<=140).slice(0,20);
+}
+function renderTicker(items){
+  const inner = document.querySelector('#tickerInner');
+  const badge = document.querySelector('#tickerBadge');
+  if(badge) badge.textContent = mode==='nsfw' ? '🔥 NSFW' : '☁ SFW';
+  if(!inner) return;
+  const sep = mode==='nsfw' ? ' 🔥 ' : ' ✦ ';
+  const half = items.map(i=>esc(i)).join(sep) + sep;
+  inner.innerHTML = half + half;
+  inner.style.animation = 'none'; void inner.offsetWidth; inner.style.animation = '';
+}
+async function updateTicker(){
+  const m = mode;
+  const badge = document.querySelector('#tickerBadge');
+  if(badge) badge.textContent = m==='nsfw' ? '🔥 NSFW' : '☁ SFW';
+  if(TICKER_CACHE[m] && TICKER_CACHE[m].length){ renderTicker(TICKER_CACHE[m]); return; }
+  const inner = document.querySelector('#tickerInner');
+  if(inner) inner.innerHTML = `<span style="color:var(--dim)">✦ Esskay-chan réfléchit à des infos fraîches... ✦ Esskay-chan réfléchit à des infos fraîches... </span>`;
+  if(!window.root || !window.root.generateText){ renderTicker(TICKER_FALLBACK[m]); return; }
+  if(tickerBusy) return;
+  tickerBusy = true;
+  try{
+    const items = await genTickerInfos(m==='nsfw');
+    if(items.length >= 5){ TICKER_CACHE[m] = items; if(mode===m) renderTicker(items); }
+    else if(mode===m) renderTicker(TICKER_FALLBACK[m]);
+  }catch(e){
+    if(mode===m) renderTicker(TICKER_FALLBACK[m]);
+  }
+  tickerBusy = false;
+}
+window.refreshTicker = ()=>{ TICKER_CACHE[mode] = null; updateTicker(); };
+function setMode(m, silent){
+  mode = m; localStorage.setItem('esskay_mode', m);
+  document.body.classList.toggle('nsfw', m==='nsfw');
+  $('#sfwPill').classList.toggle('on', m==='sfw');
+  $('#nsfwPill').classList.toggle('on', m==='nsfw');
+  $('#modeFooter').textContent = m.toUpperCase();
+  $('#statusEl').textContent = m==='nsfw'
+    ? '🔥 en ligne — NSFW 100% 18+, sans filtre, very explicite >w<'
+    : '🟢 en ligne — Mega Chill Mode • répond en FR + slang EN owO';
+  $('#botNameEl').textContent = m==='nsfw' ? 'ESSKAY-CHAN 🔥 AFTER DARK' : 'ESSKAY-CHAN v95';
+  renderChips();
+  document.querySelectorAll('.gif-btn').forEach(b=>{ b.textContent = m==='nsfw' ? '🔥 GIF 5s spicy • 20fps' : '🎞️ GIF 5s chill • 20fps'; });
+  if(!silent){
+    if(m==='nsfw') addSys('🔥 <b>MODE NSFW 100% activé</b> 18+. Tape <b>/sfw</b> ');
+    else addSys('☁ <b>MODE SFW MEGA CHILL</b> — ambiance posée. Tape <b>/nsfw</b> pour le mode 18+.');
+    updateTicker();
+  }
+}
+function askAdult(cb){
+  if(localStorage.getItem('esskay_18')==='1') adultOk=true;
+  if(adultOk){ cb(true); return; }
+  $('#ageModal').classList.add('show');
+  const y=$('#ageYesBtn'), n=$('#ageNoBtn');
+  const close=(v)=>{ $('#ageModal').classList.remove('show'); y.onclick=n.onclick=null; cb(v); };
+  y.onclick=()=>{ adultOk=true; localStorage.setItem('esskay_18','1'); close(true); };
+  n.onclick=()=>close(false);
+}
+
+function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+function pickRoot(list, fb){
+  try{
+    const r = window.root && window.root[list];
+    if(r && r.selectOne) return r.selectOne.evaluateItem;
+  }catch(e){}
+  return rnd(fb);
+}
+
+// ---------- moteur de réponses ----------
+function reply(raw){
+  let t = raw.toLowerCase().trim();
+  const has = (...ws) => ws.some(w=>t.includes(w));
+  const N = mode==='nsfw';
+
+  // COMMANDES
+  if(t==='/nsfw' || t==='nsfw' || t==='/nsfw on'){
+    if(N) return "déjà en NSFW 100% >w< tu veux que je monte encore la température ?";
+    askAdult(ok=>{
+      if(ok){ setMode('nsfw'); botSay(rnd([
+        "mmmh~ mode after dark activé 🔥 bandana toujours là, mais je suis beaucoup moins sage... tu restes avec moi ? owO",
+        "ok 100% NSFW, juste toi et moi, lumière violette, micro allumé... dis-moi ce que tu veux entendre 😏",
+        "🔥 owO bienvenue dans mon late night lobby... ici pas de filtre, que du teasing. T'es sage ou pas ce soir ?"
+      ])); } else { botSay("pas de souci owO on reste en Mega Chill SFW, installe-toi ~"); }
+    });
+    return null; // réponse async
+  }
+  if(t==='/sfw' || t==='sfw' || t==='/chill'){
+    if(!N) return "déjà en mode mega chill owO ~";
+    setMode('sfw'); return "ok on redescend en douceur ~ ☁ thé chaud, plaid, anime lofi. MEGA CHILL repris owO";
+  }
+ 
+  if(t==='/clear'){ box.innerHTML=''; boot(false); return null; }
+  if(t.indexOf('/costume')===0 || t==='/costumes' || t.indexOf('/tenue')===0 || t==='costume' || t==='tenue' || t.indexOf('/costume 👗')===0){
+    return costumeMenu();
+  }
+  if(t==='/photo' || t==='photo' || t==='/pic' || t==='/selfie' || t==='une photo ? 📸'){
+    return photoHTML(N ? "tiens, pour toi tout seul 😏" : "tiens une photo de moi owO ~");
+  }
+  if(t==='/photonsfw' || t==='/photo_nsfw' || t==='/nsfwphoto' || t==='photo nsfw ? 🔞' || t==='/photonude'){
+    if(!N){
+      askAdult(ok=>{ if(ok){ setMode('nsfw'); botSay(nsfwPhotoHTML("s'est party 🔞")); } else { botSay("on reste sage ~ demande-moi une <b>/photo</b> normale owO"); } });
+      return null;
+    }
+    return nsfwPhotoHTML("🔞 t'envoie une photo très coquine, juste pour toi.");
+  }
+  if(t==='/video' || t==='/vid' || t==='video' || t==='/nsfwvideo' || t==='une vidéo ? 🔥'){
+    if(!N){
+      askAdult(ok=>{ if(ok){ setMode('nsfw'); botSay(videoHTML("ok tu l'as voulu... 🔥")); } else { botSay("on reste sage alors ~ demande-moi une <b>/photo</b> plutôt owO"); } });
+      return null;
+    }
+    return videoHTML("mate-moi bien~");
+  }
+  if(t==='/clip'){
+    return rnd([
+      '🎬 CLIP TITLE: “MEGA CHILL STREAM — Rivals puis papotage 5h”',
+      '🎬 CLIP TITLE: “COME SAY HELLO — 3AM lobby”',
+      '🎬 CLIP TITLE: “elle clutch en Rivals avec son bandana, le chat explose”',
+      N ? '🎬 CLIP AFTER DARK: “3AM, voix basse dans le micro... le chat est en feu 🔥”' : '🎬 CLIP TITLE: “ban de hacker en direct, chat mort de rire”'
+    ]);
+  }
+  if(t==='/stats') t='stats twitch';
+
+  
+
+  // ------- PHOTOS / VIDEOS random GitHub -------
+  if(has('photo nsfw','photo sexy','photo hot','photo coquine','photo olé','photo ole','photo explicite','photo interdite','photo 18','photo after dark','photo nude','photo nue','nude','photo boob','photo seins','photo cul','photonsfw','photo nsfw ?')){
+    if(!N){
+      askAdult(ok=>{ if(ok){ setMode('nsfw'); botSay(nsfwPhotoHTML("validé 18+... 🔞 ")); } else { botSay("on reste sage ~ une <b>/photo</b> normale ? owO"); } });
+      return null;
+    }
+    return nsfwPhotoHTML("🔞 tiens, juste pour toi, garde ça entre nous owO");
+  }
+
+  if(has('photo','selfie','pics','une image','photo de toi','ta photo','montre ta photo','montre-toi','montre toi','voir ta','ton corps','mon corp','ton corp','nouveau vêtement','nouveau vetement','ton bonnet','ta peluche','encore une photo','autre photo','encore 📸')){
+    return photoHTML(N ? "ok coquin, rien que pour toi 😏..." : "avec plaisir owO ~");
+  }
+  if(has('video','vidéo','une vid','ton film','video de toi','vid de toi','clip nsfw','en video','en vidéo','autre video','autre vidéo','encore une video','encore une vidéo','encore 🔥','montre en video')){
+    if(!N){
+      askAdult(ok=>{ if(ok){ setMode('nsfw'); botSay(videoHTML("tu as 18+ donc je te montre... 🔥")); } else { botSay("reste en SFW alors ~ je peux t'envoyer une <b>/photo</b> si tu veux owO"); } });
+      return null;
+    }
+    return videoHTML("mate-moi bien, juste pour toi~");
+  }
+
+
+  if(has('quel age','ton age','ton âge','ans','birthday','anniversaire','né le','scorpion','signe')){
+    return "30 ans, née le 6 nov 1995, Scorpion 🦂 classée 44e des créatrices nées un 6 nov sur Famous Birthdays. Team scorpion = intense mais chill owO";
+  }
+  if(has('taille','poids','mesure','grande','163','53 kg','53kg')){
+    return N ? "163cm pour 53kg... petite mais dangereuse 😏 parfaite pour s'asseoir sur tes genoux en stream, non ? 👀"
+      : "~163cm / ~53kg, cheveux noirs + yeux noirs. Discrète IRL, c'est voulu ~";
+  }
+
+
+
+  if(has('twitch','follower','follow','subs',' abonné','viewer','viewers','stats','record','partenaire','partner','combien de')){
+    return "Twitch Partner depuis ~4 ans 💜 ~212 400 followers (+3200/30j), ~300 subs. 30j: 154h, ~199k h vues, 1286-1400 avg, pic 2061. Record all-time 3522 le 28 mai 2023. 2026: 761k h vues. Rank ~2200 avg, #8 Marvel Rivals. Public: USA, mecs 20-24 ans. Communauté engagée pas passive owO";
+  }
+  if(has('planning','horaire','quand stream','quand tu stream','programme','lundi','heure','stream')){
+    return "Lun-Sam dès 2-3h du mat ET, ~5h30 par stream, ~30 streams/30j. Favori: lundi 3h. Titres: MEGA CHILL STREAM / COME SAY HELLO. Viens à 3h, on est entre insomniaques chill ~";
+  }
+  if(has('marvel rivals','rivals','quel jeu','tu joues','à quoi tu joues','runescape','osrs','megabonk','ball x pit','schedule','digimon','clair obscur','silent hill','oblivion','waterpark','street fighter','monster hunter','dragonwilds','hollow knight','poe','path of exile','little nightmares')){
+    return pickRoot('marvelLine', ["Marvel Rivals c'est ma vie, 92h ce mois, top 8 Twitch"]) + "<br>Sinon: Just Chatting 810h en 2025, OSRS 601h, + Megabonk, BALL x PIT, Schedule I, Digimon Time Stranger, Clair Obscur E33, Silent Hill f, Oblivion Remastered, Waterpark Sim, SF6, MH Wilds, Dragonwilds, Hollow Knight, PoE2, Little Nightmares III. Compétitif + RPG + papotage ~";
+  }
+  if(has('setup','souris','clavier','ecran','écran','casque','micro','g300s','razer','dell','steelseries','artisan','hien','emote','materiel','matériel')){
+    return "setup sobre et efficace: souris Logitech G300S, clavier Razer BlackWidow V3 Mini, écran Dell P2714H, casque SteelSeries Arctis 5, micro Artisan Hien. Pas d'emotes perso. Pas besoin de RGB pour être chill owO";
+  }
+
+  if(has('cheveux','yeux','noir','belle','jolie','mignonne','kawaii','cute','belle')){
+    return N ? "noire de partout: cheveux noirs, yeux noirs, bandana noir... et dessous ? 👀 faudra passer en late night pour découvrir~" : "merci owO cheveux noirs + yeux noirs + bandana, team mystère ~";
+  }
+  if(has('anime','manga','one piece','naruto','otaku','owO','òwó')){
+    return "I like anime òwó c'est même ma bio X depuis jan 2022 ! Je suis une vraie passionnée, ça transparaît partout. C'est quoi ton anime du moment ? On s'en fait un ensemble en chill ?";
+  }
+
+  if(has('twitter',' X ','instagram','insta','tiktok','youtube','reseaux','réseaux','sociaux','reddit','viral','soyfebuenafama','fanpage')){
+    return "Retrouve-moi: X @Esskayuwu ~222k (319 posts, depuis 18 jan 2022), Insta @esskayuwu 76k-175k (depuis sept 2021), TikTok @esskayuwu1 (modeste), YouTube clips communauté (bans hackers...), fanpage @esskayfanpage. Fun fact: viral Reddit avril 2022 en soyfebuenafama avant mes streams réguliers (oct 2022, canal créé fév 2022). Insta sept 2021 → X jan 2022 → Reddit avr 2022 → record 3522 en mai 2023 → Partner 2026 💜";
+  }
+  // fallback SFW générique
+  return rnd([
+    "hmm intéressant owO dis-m'en plus ? Ici on est mega chill, on prend le temps ~",
+    "owO je suis plus Rivals + papotage que philo à 3h, mais je t'écoute ! Tu veux parler jeux, anime ou stats ?",
+    "COME SAY HELLO ! pose-moi une question sur mes streams, mon setup, mon planning ou mes animés ~"
+  ]);
+}
+
+// --- tips affichés pendant que le bot réfléchit / génère (10 par mode) ---
+const THINK_TIPS_SFW = [
+  "💡 /photo → une photo random de l'archive",
+  "💡 /costume → le builder : coche plusieurs options puis Valider",
+  "💡 /image + description → génère une image (ex: /image casque neko)",
+  "💡 /stats → mes stats Twitch détaillées",
+  "💡 /clip → un titre de clip au hasard",
+  "💡 questions précises = meilleures réponses (setup, planning, jeux)",
+  "💡 /clear → efface le chat et on recommence",
+  "💡 /nsfw → mode 18+ 🔥 (avec vérif d'âge)",
+  "💡 demande-moi mon anime du moment 🎌",
+  "💡 le compteur de viewers bouge en live-ish 👁"
+];
+const THINK_TIPS_NSFW = [
+  "🔥 /costume → Nude totale, Haut/Bas uniquement, Poitrine...",
+  "🔥 CADRAGE → corps entier, haut, bas, ou gros plan précis",
+  "🔥 ACTION → masturbation + éjaculation, intensité au choix",
+  "🔥 /video → une vidéo random 🔞",
+  "🔥 'photo nsfw' → une photo coquine random",
+  "🔥 décris tout après /image pour une vraie génération sur mesure",
+  "🔥 précise la pose : close-up, allongée, miroir...",
+  "🔥 dis 'encore' pour un autre random",
+  "🔥 le texte libre du builder accepte 200 caractères",
+  "🔥 /sfw → redescendre en chill ☁"
+];
+function attachThinkTips(tdiv){
+  const div = document.createElement('div');
+  div.className = 'think-tip';
+  const pick = ()=> rnd(mode==='nsfw' ? THINK_TIPS_NSFW : THINK_TIPS_SFW);
+  div.textContent = pick();
+  tdiv.appendChild(div); scrollChat();
+  const iv = setInterval(()=>{ div.textContent = pick(); scrollChat(); }, 2600);
+  return ()=>{ clearInterval(iv); div.remove(); };
+}
+let botBusy=false;
+async function botSay(text){
+  botBusy=true;
+  const tdiv = document.createElement('div');
+  tdiv.className='msg bot';
+  tdiv.innerHTML=`<span class="who">${mode==='nsfw'?'ESSKAY-CHAN 🔥':'ESSKAY-CHAN ☁'}<span class="time">${time()}</span></span><span class="txt"><span class="typing"><i></i><i></i><i></i></span></span>`;
+  box.appendChild(tdiv); scrollChat();
+  const stopTips = attachThinkTips(tdiv);
+  await new Promise(r=>setTimeout(r, 600+Math.random()*900+Math.min(1200, text.length*4)));
+  stopTips();
+  tdiv.querySelector('.txt').innerHTML=text;
+  scrollChat();
+  botBusy=false;
+}
+
+async function send(){
+  const v = input.value.trim();
+  if(!v || botBusy) return;
+  detectMood(v); learnFacts(v);
+  input.value='';
+  addMsg('user', esc(v), 'user');
+  box.lastElementChild.dataset.raw = v;
+  msgCount++;
+  route(v);
+}
+
+$('#sendBtn').onclick=send;
+input.addEventListener('keydown',e=>{ if(e.key==='Enter') send(); });
+$('#clipBtn').onclick=()=>{ input.value='/clip'; send(); };
+$('#helpPill').onclick=()=>{ input.value='/help'; send(); };
+$('#sfwPill').onclick=()=>{ if(mode!=='sfw'){ setMode('sfw'); botSay("ok retour mega chill ☁ ~"); } };
+$('#nsfwPill').onclick=()=>{ const r=reply('/nsfw'); if(r) botSay(r); };
+function closeSide(){ document.querySelector('.sidebar').classList.remove('open'); $('#sideOverlay').classList.remove('show'); }
+$('#linksBtn').onclick=()=>{ document.querySelector('.sidebar').classList.add('open'); $('#sideOverlay').classList.add('show'); };
+$('#sideClose').onclick=closeSide;
+$('#sideOverlay').onclick=closeSide;
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSide(); });
+
+// viewers fake live + VHS clock
+let viewers = 1300+Math.floor(Math.random()*200);
+setInterval(()=>{ viewers+=Math.floor(Math.random()*21)-8; if(viewers<900)viewers=900; $('#viewerCount').textContent=viewers; },3000);
+let sec=0; setInterval(()=>{ sec++; const h=String(Math.floor(sec/3600)).padStart(2,'0'),m=String(Math.floor(sec/60)%60).padStart(2,'0'),s=String(sec%60).padStart(2,'0'); $('#vhs').textContent=`▶ ${h}:${m}:${s}  SP`; },1000);
+
+function boot(withHello=true){
+  setMode(mode, true);
+  updateTicker();
+  // --- restaure profil / mémoire / conversations ---
+  try{
+    document.querySelector('#userNameInput').value = settings.userName||'';
+    document.querySelector('#userInfoInput').value = settings.userInfo||'';
+    document.querySelector('#memGlobalToggle').checked = !!settings.memGlobal;
+  }catch(e){}
+  renderMood(); renderFacts(); renderConvList(); renderMessages(); rebuildHist();
+  // --- sauvegarde auto à chaque nouveau message ---
+  new MutationObserver(()=>{ clearTimeout(saveT); saveT = setTimeout(saveConv, 600); }).observe(box, {childList:true, subtree:true});
+  // --- actions ↻ / ✏️ sur tes messages ---
+  box.addEventListener('click', e=>{
+    const b = e.target.closest && e.target.closest('[data-act]');
+    if(!b) return;
+    const div = b.closest('.msg');
+    const raw = (div && div.dataset.raw) || (div && div.querySelector('.txt').textContent) || '';
+    if(b.dataset.act==='edit'){ input.value = raw; input.focus(); }
+    else sendRaw(raw);
+  });
+  // --- fichiers + imports ---
+  const fi = document.querySelector('#fileInput');
+  if(fi) fi.onchange = ()=>{ if(fi.files[0]) window.handleFile(fi.files[0]); fi.value=''; };
+  const ic = document.querySelector('#importChatsInput');
+  if(ic) ic.onchange = async ()=>{
+    try{
+      const j = JSON.parse(await ic.files[0].text());
+      if(j.app!=='esskayuwu' || j.kind!=='chats' || !Array.isArray(j.convs)) throw new Error('fichier invalide');
+      const ids = new Set(convs.map(c=>c.id));
+      j.convs.forEach(c=>{ if(!c.messages) return; if(ids.has(c.id)) c.id = 'c'+Date.now().toString(36)+Math.floor(Math.random()*1e4); c.name = String(c.name||'Chat importé').slice(0,40); convs.push(c); });
+      convs = convs.slice(-20); store.set('esskay_convs', convs);
+      activeId = convs[convs.length-1].id; store.set('esskay_active', activeId);
+      renderConvList(); renderMessages(); rebuildHist();
+      botSay(`chats importés owO ~ ${j.convs.length} conversation(s) de retour 💜`);
+    }catch(e){ botSay(`import foiré owO (${esc(String(e.message||e)).slice(0,120)})`); }
+    ic.value='';
+  };
+  const is = document.querySelector('#importSettingsInput');
+  if(is) is.onchange = async ()=>{
+    try{
+      const j = JSON.parse(await is.files[0].text());
+      if(j.app!=='esskayuwu' || j.kind!=='settings') throw new Error('fichier invalide');
+      if(j.settings){ settings = Object.assign(settings, j.settings); store.set('esskay_settings', settings); }
+      if(Array.isArray(j.facts)){ facts = j.facts.slice(-50); store.set('esskay_facts', facts); }
+      if(j.mood && MOODS[j.mood.name]){ mood = j.mood; store.set('esskay_mood', mood); }
+      try{
+        document.querySelector('#userNameInput').value = settings.userName||'';
+        document.querySelector('#userInfoInput').value = settings.userInfo||'';
+        document.querySelector('#memGlobalToggle').checked = !!settings.memGlobal;
+      }catch(e){}
+      renderMood(); renderFacts();
+      botSay(`paramètres restaurés owO ~ profil, mémoire et humeur de retour 💜`);
+    }catch(e){ botSay(`import foiré owO (${esc(String(e.message||e)).slice(0,120)})`); }
+    is.value='';
+  };
+  if(!withHello) return;
+  if(activeConv().messages.length) return; // conversations restaurées : pas de spam
+  addSys('💿 <b>ESSKAYUWU.EXE chargée</b> <b>/help</b>. <b>/nsfw</b> = 100% NSFW 18+.');
+  setTimeout(()=>{
+    botSay(mode==='nsfw'
+      ? "🔥 oh tu reviens installe-toi, on est que tous les deux UwU"
+      : pickRoot('greetingLine', ["heyy owO bienvenue dans mon lobby mega chill ~"]) + "<br>Je suis <b>Esskay-chan</b>, version fictive mega chill d'Esskayuwu 💜 Marvel Rivals, anime, 3h du mat. Pose-moi tes questions !"
+    );
+  }, 500);
+}
+boot(true);
+})();
+</script>
