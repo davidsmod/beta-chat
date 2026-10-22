@@ -1,18 +1,34 @@
 
-import express from "express";
+export default {
+  async fetch(request) {
+    const url = new URL(request.url);
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    };
 
-app.use(express.json({ limit: "1mb" }));
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders,
+      });
+    }
 
-app.get("/", (req, res) => {
-  res.json({
-    status: "online",
-    service: "perchance-chat-api"
-  });
-});
+    if (url.pathname === "/") {
+      return Response.json(
+        {
+          status: "online",
+          service: "perchance-chat-api",
+        },
+        { headers: corsHeaders }
+      );
+    }
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Serveur démarré sur le port ${PORT}`);
-});
+    return Response.json(
+      { error: "Route not found" },
+      { status: 404, headers: corsHeaders }
+    );
+  },
+};
